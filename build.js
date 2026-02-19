@@ -1,0 +1,24 @@
+const esbuild = require('esbuild');
+
+const lambdas = [
+  {
+    entry: 'lambda/api-gateway-authorizer/handler.ts',
+    out: 'api-gateway-authorizer-lambda.js',
+  },
+  //   { entry: "src/lambdaB.ts", out: "dist/lambdaB.js" }
+];
+
+lambdas.forEach((lambda) => {
+  esbuild
+    .build({
+      entryPoints: [lambda.entry],
+      bundle: true,
+      platform: 'node',
+      target: 'node18',
+      outfile: lambda.out,
+      sourcemap: true,
+      minify: false,
+      tsconfig: 'tsconfig.json',
+    })
+    .catch(() => process.exit(1));
+});
