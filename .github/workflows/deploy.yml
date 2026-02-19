@@ -38,5 +38,5 @@ jobs:
       - name: Deploy Lambda
         run: |
           aws lambda update-function-code \
-            --function-name lambda-testing1 \
+            --function-name lambda-testing-1 \
             --zip-file fileb://lambda.zip
