@@ -27,7 +27,7 @@ jobs:
       - name: Zip Lambda
         run: |
           cd dist
-          zip -r ../lambda1.zip Lambda/lambda1 shared node_modules
+          zip -r ../lambda.zip lambda/api-gateway-authorizer
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
