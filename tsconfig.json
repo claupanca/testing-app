@@ -12,5 +12,8 @@
     "resolveJsonModule": true,
     "sourceMap": true
   },
-  "include": ["lambda/**/*.ts", "lambda/api-gateway-authorizer/shared/**/*.ts"]
+  "include": [
+    "lambda/**/*.ts",
+    "lambda/shared/**/*.ts"
+  ]
 }

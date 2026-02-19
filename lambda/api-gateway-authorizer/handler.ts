@@ -1,59 +1,66 @@
 import type {
   Context,
   APIGatewayAuthorizerResult,
-  APIGatewayEvent,
-} from 'aws-lambda';
-import jwt from 'jsonwebtoken';
-import { fetchPublicKeySecret } from './shared/aws';
-
-import dotenv from 'dotenv';
-dotenv.config();
+  APIGatewayRequestAuthorizerEventV2,
+} from "aws-lambda";
+import jwt from "jsonwebtoken";
+import { fetchPublicKeySecret } from "../shared/aws";
 
 export const handler = async (
-  event: APIGatewayEvent,
-  context: Context
+  event: Partial<APIGatewayRequestAuthorizerEventV2>,
+  context: Context,
 ): Promise<{ isAuthorized: boolean }> => {
-  // console.log(`Event: ${JSON.stringify(event, null, 2)}`);
-  // console.log(`Context: ${JSON.stringify(context, null, 2)}`);
-  console.log('BRAND NEW UPLOADED');
+  try {
+    const headers = event.headers || {};
+    // Case-insensitive header lookup
+    const authHeader = Object.keys(headers).find(
+      (key) => key.toLowerCase() === "authorization",
+    )
+      ? headers[
+      Object.keys(headers).find(
+        (key) => key.toLowerCase() === "authorization",
+      ) as string
+      ]
+      : undefined;
 
-  const headers = event.headers || {};
-  const authHeader = headers['authorization'] || headers['Authorization'];
-  console.log(`Authorization header: ${authHeader}`);
-  const jwtToken = authHeader?.split(' ')[1] || '';
-  console.log(`Extracted JWT token: ${jwtToken}`);
+    if (!authHeader) {
+      console.warn("No Authorization header found");
+      return { isAuthorized: false };
+    }
 
-  const decoded = jwt.verify(jwtToken, 'my-secret-key');
-  console.log('decoded', decoded);
+    console.log("authHeader", authHeader);
 
-  const secretKey = await fetchPublicKeySecret();
-  console.log('secretKey here', secretKey);
+    const match = authHeader.match(/^Bearer\s+(.*)$/i);
+    if (!match || !match[1]) {
+      console.warn(
+        'Invalid Authorization header format. Expected "Bearer <token>"',
+      );
+      return { isAuthorized: false };
+    }
 
-  const secretString = JSON.parse(
-    secretKey?.SecretString || ''
-  ).PUBLIC_TOKEN_KEY;
+    const jwtToken = match[1];
+    const publicKey = await fetchPublicKeySecret();
 
-  console.log('secretString', secretString);
+    if (!publicKey) {
+      console.error("Failed to retrieve public key secret");
+      // Fail secure implies returning false or throwing. throwing might cause 500.
+      return { isAuthorized: false };
+    }
 
-  // const expiresIn = '3h';
-  // const jwtToken = jwt.sign({ foo: 'hello world' }, 'my-secret-key', {
-  //   expiresIn,
-  //   algorithm: 'HS256',
-  // });
-  // console.log('jwtToken', jwtToken);
-  // return { isAuthorized: true };
+    const decoded = jwt.verify(jwtToken, publicKey, {
+      algorithms: ["HS256", "RS256"],
+    });
+    // Note: Ensure your algorithm matches what signed the token!
+    // If using a Public Key (RS256), the second arg is the key.
+    // If using a Secret (HS256), the second arg is the secret.
 
-  if (decoded) {
-    return { isAuthorized: true };
-  } else {
+    if (decoded) {
+      return { isAuthorized: true };
+    }
+
+    return { isAuthorized: false };
+  } catch (error) {
+    console.error("Authorization failed:", error);
     return { isAuthorized: false };
   }
-
-  // return {
-  //   statusCode: 200,
-  //   body: JSON.stringify({
-  //     message: 'hello world',
-  //     //   jwtToken,
-  //   }),
-  // };
 };
