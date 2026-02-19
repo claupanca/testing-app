@@ -3,7 +3,7 @@ const esbuild = require('esbuild');
 const lambdas = [
   {
     entry: 'lambda/api-gateway-authorizer/handler.ts',
-    out: 'api-gateway-authorizer-lambda.js',
+    out: 'dist/api-gateway-authorizer-lambda.js',
   },
   //   { entry: "src/lambdaB.ts", out: "dist/lambdaB.js" }
 ];
