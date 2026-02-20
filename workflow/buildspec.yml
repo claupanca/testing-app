@@ -10,8 +10,8 @@ phases:
 
   pre_build:
     commands:
+      - export DATABASE_URL=$(aws secretsmanager get-secret-value --secret-id DATABASE_URL --query SecretString --output text | jq -r .DATABASE_URL)
       - echo "Running Prisma migrations..."
-      # DATABASE_URL should be set as a CodeBuild environment variable or retrieved from Secrets Manager
       - npx prisma migrate deploy
 
   build:
