@@ -34,12 +34,12 @@ jobs:
       - name: Zip Authorizer Lambda
         run: |
           cd dist/api-gateway-authorizer
-          zip -r ../api-gateway-authorizer.zip api-gateway-authorizer 
+          zip -r ../../api-gateway-authorizer.zip .
 
       - name: Zip RDS Lambda
         run: |
           cd dist/rds-lambda
-          zip -r ../rds-lambda.zip rds-lambda   
+          zip -r ../../rds-lambda.zip .
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
