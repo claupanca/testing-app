@@ -16,10 +16,7 @@ const run = async () => {
 
     const mockContext = {} as Context;
     const mockEvent = {
-        body: {
-            name: "Test Clau 2",
-            email: "claudiu2@prisma.io",
-        },
+        body: "{\"email\":\"claudiu@aaa.com\",\"name\":\"claudiu\"}"
     } as unknown as APIGatewayProxyEvent;
 
     try {
