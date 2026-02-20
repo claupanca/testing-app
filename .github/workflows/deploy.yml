@@ -8,6 +8,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        lambda:
+          - name: api-gateway-authorizer
+            function_name: api-gatway-authorizer
+          - name: rds-lambda
+            function_name: rds-lambda
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,8 +33,8 @@ jobs:
 
       - name: Zip Lambda
         run: |
-          cd dist
-          zip -r ../lambda.zip .
+          cd dist/${{matrix.lambda.name}}
+          zip -r ../${{matrix.lambda.name}}.zip .  
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -38,5 +46,5 @@ jobs:
       - name: Deploy Lambda
         run: |
           aws lambda update-function-code \
-            --function-name lambda-testing-1 \
-            --zip-file fileb://lambda.zip
+            --function-name ${{matrix.lambda.name}} \
+            --zip-file fileb://${{matrix.lambda.name}}.zip
