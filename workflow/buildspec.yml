@@ -10,7 +10,7 @@ phases:
 
   pre_build:
     commands:
-      - export DATABASE_URL=$(aws secretsmanager get-secret-value --secret-id DATABASE_URL --query SecretString --output text | jq -r .DATABSE_URL)
+      - export DATABASE_URL=$(aws secretsmanager get-secret-value --secret-id DATABASE_URL --query SecretString --output text | jq -r .DATABASE_URL)
       - echo "Running Prisma migrations..."
       - npx prisma migrate deploy
 
