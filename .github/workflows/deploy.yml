@@ -31,7 +31,7 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
-      - name: Zip Lambda
+      - name: Zip Lambdas
         run: |
           cd dist/${{matrix.lambda.name}}
           zip -r ../${{matrix.lambda.name}}.zip .  
