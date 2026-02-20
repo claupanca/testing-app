@@ -28,19 +28,30 @@ export const handler = async (event: APIGatewayEvent, context: Context) => {
         allUsers = await prisma.users.findMany({});
         console.log("All users:", JSON.stringify(allUsers, null, 2));
     }
+    try {
 
-    main()
-        .then(async () => {
-            await prisma.$disconnect();
-        })
-        .catch(async (e) => {
-            console.error(e);
-            await prisma.$disconnect();
-            process.exit(1);
-        });
+        main()
+            .then(async () => {
+                await prisma.$disconnect();
+            })
+            .catch(async (e) => {
+                console.error(e);
+                await prisma.$disconnect();
+                process.exit(1);
+            });
 
-    return {
-        statusCode: 200,
-        body: allUsers
+        return {
+            statusCode: 200,
+            body: allUsers
+        }
     }
+    catch (e) {
+        console.log('Error', e)
+
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: e })
+        }
+    }
+
 }
