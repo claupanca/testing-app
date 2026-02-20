@@ -8,13 +8,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        lambda:
-          - name: api-gateway-authorizer
-            function_name: api-gatway-authorizer
-          - name: rds-lambda
-            function_name: rds-lambda
+    # strategy:
+    #   matrix:
+    #     lambda:
+    #       - name: api-gateway-authorizer
+    #         function_name: api-gatway-authorizer
+    #       - name: rds-lambda
+    #         function_name: rds-lambda
 
     steps:
       - name: Checkout code
@@ -31,10 +31,15 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
-      - name: Zip Lambdas
+      - name: Zip Authorizer Lambda
         run: |
-          cd dist/${{matrix.lambda.name}}
-          zip -r ../${{matrix.lambda.name}}.zip .  
+          cd dist/api-gateway-authorizer
+          zip -r ../api-gateway-authorizer.zip .  
+
+      - name: Zip RDS Lambda
+        run: |
+          cd dist/rds-lambda
+          zip -r ../rds-lambda.zip .  
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -43,8 +48,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-north-1
 
-      - name: Deploy Lambda
+      - name: Deploy Authorizer Lambda
         run: |
           aws lambda update-function-code \
-            --function-name ${{matrix.lambda.name}} \
-            --zip-file fileb://${{matrix.lambda.name}}.zip
+            --function-name api-gatway-authorizer \
+            --zip-file fileb://api-gateway-authorizer-lambda.zip
+
+      - name: Deploy RDS Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name rds-lambda \
+            --zip-file fileb://rds-lambda.zip
