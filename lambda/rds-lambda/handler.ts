@@ -4,7 +4,9 @@ import { users } from "../../generated/prisma/client";
 
 
 export const handler = async (event: APIGatewayEvent, context: Context) => {
-    // console.log('event', event);
+    console.log('event', event.body);
+    console.log('event2', typeof event.body);
+    console.log('event3', JSON.parse(event.body || '{}'));
     // console.log('context', context);
 
     const eventBody = JSON.parse(event.body || '{}');
@@ -17,8 +19,8 @@ export const handler = async (event: APIGatewayEvent, context: Context) => {
         // Create a new user with a post
         const user = await prisma.users.create({
             data: {
-                name: eventBody.name,
-                email: eventBody.email,
+                name: eventBody?.name,
+                email: eventBody?.email,
             },
 
         });

@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { handler } from './handler';
-import { APIGatewayEvent, Context } from 'aws-lambda';
+import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
 const run = async () => {
     console.log('--- STARTING LOCAL TEST ---');
@@ -16,11 +16,11 @@ const run = async () => {
 
     const mockContext = {} as Context;
     const mockEvent = {
-        body: JSON.stringify({
-            name: "Test Clau",
-            email: "claudiu@prisma.io",
-        }),
-    } as APIGatewayEvent;
+        body: {
+            name: "Test Clau 2",
+            email: "claudiu2@prisma.io",
+        },
+    } as unknown as APIGatewayProxyEvent;
 
     try {
         console.time('Handler Execution');
