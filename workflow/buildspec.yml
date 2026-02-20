@@ -1,0 +1,41 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "Installing dependencies..."
+      - npm install
+
+  pre_build:
+    commands:
+      - echo "Running Prisma migrations..."
+      # DATABASE_URL should be set as a CodeBuild environment variable or retrieved from Secrets Manager
+      - npx prisma migrate deploy
+
+  build:
+    commands:
+      - echo "Building TypeScript..."
+      - npm run build
+
+      - echo "Zipping Authorizer Lambda..."
+      - cd dist/api-gateway-authorizer
+      - zip -r ../../api-gateway-authorizer.zip .
+      - cd ../../
+
+      - echo "Zipping RDS Lambda..."
+      - cd dist/rds-lambda
+      - zip -r ../../rds-lambda.zip .
+      - cd ../../
+
+  post_build:
+    commands:
+      - echo "Deploying Lambdas..."
+      - aws lambda update-function-code --function-name api-gateway-authorizer --zip-file fileb://api-gateway-authorizer.zip
+      - aws lambda update-function-code --function-name rds-lambda --zip-file fileb://rds-lambda.zip
+
+artifacts:
+  files:
+    - api-gateway-authorizer.zip
+    - rds-lambda.zip
