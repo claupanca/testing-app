@@ -28,6 +28,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Run Prisma Migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npx prisma migrate deploy
+
       - name: Build TypeScript
         run: npm run build
 
