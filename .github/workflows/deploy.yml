@@ -52,7 +52,7 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name api-gatway-authorizer \
-            --zip-file fileb://api-gateway-authorizer-lambda.zip
+            --zip-file fileb://api-gateway-authorizer.zip
 
       - name: Deploy RDS Lambda
         run: |
